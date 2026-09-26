@@ -33,7 +33,6 @@ export default function ProductListScreen() {
       <FlatList
         data={filteredProducts}
         keyExtractor={(item) => item.id}
-        numColumns={2}
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
           <ProductTile product={item} onPress={() => router.push(`/product/${item.id}`)} />
@@ -60,7 +59,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   listContent: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
     paddingBottom: 24,
   },
   emptyState: {

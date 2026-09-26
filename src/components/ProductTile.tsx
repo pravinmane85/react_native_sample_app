@@ -12,15 +12,19 @@ interface ProductTileProps {
 export function ProductTile({ product, onPress }: ProductTileProps) {
   return (
     <Pressable style={styles.card} onPress={onPress}>
-      <Image source={{ uri: product.image }} style={styles.image} resizeMode="cover" />
-      {product.badge ? (
-        <View style={styles.badge}>
-          <Text style={typography.badge}>{product.badge}</Text>
-        </View>
-      ) : null}
+      <View style={styles.imageWrapper}>
+        <Image source={{ uri: product.image }} style={styles.image} resizeMode="cover" />
+        {product.badge ? (
+          <View style={styles.badge}>
+            <Text style={[typography.badge, styles.badgeText]} numberOfLines={2}>
+              {product.badge}
+            </Text>
+          </View>
+        ) : null}
+      </View>
       <View style={styles.info}>
         <Text style={typography.brand}>{product.make}</Text>
-        <Text style={typography.productName} numberOfLines={1}>
+        <Text style={typography.productName} numberOfLines={2}>
           {product.name}
         </Text>
         <Text style={typography.price}>
@@ -44,30 +48,41 @@ export function ProductTile({ product, onPress }: ProductTileProps) {
 
 const styles = StyleSheet.create({
   card: {
-    flex: 1,
-    margin: 8,
+    flexDirection: 'row',
+    marginBottom: 12,
     borderRadius: 12,
     backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: colors.border,
     overflow: 'hidden',
   },
+  imageWrapper: {
+    width: 110,
+    height: 110,
+  },
   image: {
     width: '100%',
-    aspectRatio: 1,
+    height: '100%',
     backgroundColor: colors.surface,
   },
   badge: {
     position: 'absolute',
-    top: 8,
-    left: 8,
+    top: 6,
+    left: 6,
+    maxWidth: 98,
     backgroundColor: colors.primary,
-    borderRadius: 10,
-    paddingHorizontal: 8,
+    borderRadius: 8,
+    paddingHorizontal: 6,
     paddingVertical: 3,
   },
+  badgeText: {
+    fontSize: 10,
+    lineHeight: 12,
+  },
   info: {
-    padding: 10,
+    flex: 1,
+    padding: 12,
+    justifyContent: 'center',
   },
   swatchRow: {
     flexDirection: 'row',
