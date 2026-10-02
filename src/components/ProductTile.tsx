@@ -1,5 +1,6 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useFavorites } from '../context/FavoritesContext';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { Product } from '../types/product';
@@ -10,6 +11,9 @@ interface ProductTileProps {
 }
 
 export function ProductTile({ product, onPress }: ProductTileProps) {
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const favorite = isFavorite(product.id);
+
   return (
     <Pressable style={styles.card} onPress={onPress}>
       <View style={styles.imageWrapper}>
@@ -21,6 +25,15 @@ export function ProductTile({ product, onPress }: ProductTileProps) {
             </Text>
           </View>
         ) : null}
+        <Pressable
+          style={styles.favoriteButton}
+          hitSlop={8}
+          onPress={() => toggleFavorite(product.id)}
+          accessibilityRole="button"
+          accessibilityLabel={favorite ? `Remove ${product.name} from favorites` : `Add ${product.name} to favorites`}
+        >
+          <Text style={[styles.favoriteIcon, favorite && styles.favoriteIconActive]}>{favorite ? '♥' : '♡'}</Text>
+        </Pressable>
       </View>
       <View style={styles.info}>
         <Text style={typography.brand}>{product.make}</Text>
@@ -78,6 +91,25 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 10,
     lineHeight: 12,
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  favoriteIcon: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    lineHeight: 18,
+  },
+  favoriteIconActive: {
+    color: colors.primary,
   },
   info: {
     flex: 1,
