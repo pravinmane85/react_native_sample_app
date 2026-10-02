@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFavorites } from '../../context/FavoritesContext';
 import { products } from '../../data/products';
 import { colors } from '../../theme/colors';
 import { typography } from '../../theme/typography';
@@ -8,6 +9,7 @@ import { typography } from '../../theme/typography';
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const product = products.find((item) => item.id === id);
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   if (!product) {
     return (
@@ -17,9 +19,22 @@ export default function ProductDetailScreen() {
     );
   }
 
+  const favorite = isFavorite(product.id);
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Image source={{ uri: product.image }} style={styles.image} resizeMode="cover" />
+      <View style={styles.imageWrapper}>
+        <Image source={{ uri: product.image }} style={styles.image} resizeMode="cover" />
+        <Pressable
+          style={styles.favoriteButton}
+          hitSlop={8}
+          onPress={() => toggleFavorite(product.id)}
+          accessibilityRole="button"
+          accessibilityLabel={favorite ? `Remove ${product.name} from favorites` : `Add ${product.name} to favorites`}
+        >
+          <Text style={[styles.favoriteIcon, favorite && styles.favoriteIconActive]}>{favorite ? '♥' : '♡'}</Text>
+        </Pressable>
+      </View>
 
       {product.badge ? (
         <View style={styles.badge}>
@@ -78,12 +93,33 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 40,
   },
+  imageWrapper: {
+    marginBottom: 16,
+  },
   image: {
     width: '100%',
     aspectRatio: 1,
     borderRadius: 12,
     backgroundColor: colors.surface,
-    marginBottom: 16,
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  favoriteIcon: {
+    fontSize: 20,
+    color: colors.textSecondary,
+    lineHeight: 22,
+  },
+  favoriteIconActive: {
+    color: colors.primary,
   },
   badge: {
     alignSelf: 'flex-start',
