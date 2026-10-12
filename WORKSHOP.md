@@ -2,67 +2,42 @@
 
 ## Section 1: Installation (10 min)
 
-Set this up before the session if you can. You don't need the repo for Steps 1 and 2.
+This is an interactive workshop. Please set up before the session. You only need to pick **one** of these options:
 
-### Step 1: Install Node.js and Git
+**Virtual device**
+- Android emulator
+- iOS simulator (you need a Mac)
 
-- Node.js 20.19.4 or newer: https://nodejs.org
-- Git: https://git-scm.com/downloads
+**Real device**
+- Android device
+- iOS device
 
-### Step 2: Set up a way to run the app
+**Virtual development environment**
+- Expo Snack: [React Native Workshop](https://snack.expo.dev/@rogoodvoda/react-native-workshop)
 
-Pick **one**.
+The demo is a React Native app run with Expo, an open-source framework built on top of React Native.
 
-#### Android emulator
+If you are stuck on an option
+- Go for the emulator/simulator if you want something closest to our day to day developemnt.
+- Go for Expo snack if you don't have time, or cannot install the tools.
 
-These steps are for a Mac and use Homebrew.
+### Step 1: Emulator, simulator or real device
 
-1. Install the JDK:
-   ```bash
-   brew install --cask zulu@17
-   ```
-2. Install **Android Studio** (https://developer.android.com/studio) and open it. In the Setup Wizard, choose **Standard** and finish the install.
-3. Go to **Settings > Languages & Frameworks > Android SDK**.
-   - **SDK Platforms** tab: select **Android SDK Platform 36**.
-   - **SDK Tools** tab: make sure **Android SDK Build-Tools** and **Android Emulator** are installed.
-4. Add these lines to `~/.zshrc` (or `~/.bash_profile` if you use bash), then open a new terminal or run `source ~/.zshrc`:
-   ```bash
-   export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
-   export ANDROID_HOME=$HOME/Library/Android/sdk
-   export PATH=$PATH:$ANDROID_HOME/emulator
-   export PATH=$PATH:$ANDROID_HOME/platform-tools
-   ```
-5. Check it works. This should print a version:
-   ```bash
-   adb version
-   ```
-6. In Android Studio, click **More Actions > Virtual Device Manager > Create virtual device**.
-7. Pick a recent Pixel and a recent system image (download it if asked), then click **Finish**. Choose an arm64 image on Apple silicon and x86_64 on an Intel Mac. A Google Play image is not required.
-8. Click the **Play** button next to the device to start the emulator, and wait for the Android home screen.
+1. Clone the workshop repo: https://github.com/VFUK-Digital/react_native_sample_app
+2. Install the supporting tools: [Set up your environment](https://docs.expo.dev/get-started/set-up-your-environment/). You also need Node.js 20.19.4 or newer (https://nodejs.org) and Git (https://git-scm.com/downloads).
+3. Then, depending on your option:
+   - **Emulator or simulator:** install Xcode for the iOS simulator (Mac only), or Android Studio for the Android emulator. The setup link above walks you through it. Create a virtual device, and for iOS use iOS 16.4 or newer.
+   - **Real device:** install **Expo Go** on your device (App Store or Play Store) and create an Expo account at https://expo.dev/signup. You can use any email, as this is a demo site.
 
-If the on-screen keyboard never appears, open the device's advanced settings and turn off **Enable keyboard input**.
+### Step 2: Expo Snack
 
-Expo Go is installed into the emulator for you when you start the app in Step 4.
+You can work directly in the Snack instead. No setup is required, and you don't need an account. This is enough for the workshop. If you use it, skip Steps 3 and 4.
 
-#### iOS simulator (Mac only)
+### Step 3: Install the packages
 
-1. Install **Xcode** from the Mac App Store.
-2. Open Xcode. In the menu bar, go to **Xcode > Open Developer Tool > Device Hub**.
-3. Click **+ > iPhone** and choose a model and an iOS version. Expo Go needs iOS 16.4 or newer.
-4. If Xcode asks you to accept the licence, run `sudo xcodebuild -license accept`.
-5. Boot the simulator before you start the app.
-
-Expo Go is installed into the simulator for you when you start the app in Step 4. If you see "requires a newer version of iOS", create a simulator with a newer runtime.
-
-#### Shared Snack (nothing to install)
-
-Open https://snack.expo.dev/@rogoodvoda/react-native-workshop in your browser. If you use it, you can skip Steps 3 and 4.
-
-### Step 3: Get the code
+From the project folder:
 
 ```bash
-git clone https://github.com/VFUK-Digital/react_native_sample_app.git
-cd react_native_sample_app
 npm install
 ```
 
@@ -72,31 +47,23 @@ Stay on the default branch unless you are told to switch.
 
 Start the app and leave it running while you work:
 
-- Android emulator: `npm run android`
-- iOS simulator: `npm run ios`
+- **Android emulator:** `npm run android`
+- **iOS simulator:** `npm run ios`
+- **Real device:**
+  1. Sign in to your Expo account in the terminal:
+     ```bash
+     npx expo login
+     ```
+  2. Put your device on the same Wi-Fi network as your computer.
+  3. Start the app:
+     ```bash
+     npm run start
+     ```
+  4. Scan the QR code from the terminal. On an iPhone use the Camera app. On Android open Expo Go and tap **Scan QR code**.
 
-If an emulator is slow, close other apps. You should see a header, "Phones & SIM cards", above an empty screen. Fast Refresh applies each change on save.
+Expo Go is installed into an emulator or simulator for you. On a real device, sign in to the same Expo account in Expo Go, and update Expo Go if it reports a version mismatch.
 
-### Step 5 (optional): run it on your own phone
-
-You don't need a simulator for this. Expo Go is enough, and you don't need Xcode or Android Studio.
-
-1. Install **Expo Go** from the App Store (iPhone) or the Play Store (Android).
-2. Create a free Expo account if you don't have one: https://expo.dev/signup
-3. Sign in to the same account in Expo Go and in your terminal. Expo Go only opens a project when both are signed in to the same account.
-   ```bash
-   npx expo login
-   ```
-4. Put your phone on the same Wi-Fi network as your computer.
-5. Start the app:
-   ```bash
-   npm run start
-   ```
-6. Scan the QR code from the terminal:
-   - **iPhone:** use the Camera app, and allow the local network prompt if it asks.
-   - **Android:** open Expo Go and tap **Scan QR code**.
-
-If Expo Go reports a version mismatch, update Expo Go.
+You should see a header, "Phones & SIM cards", above an empty screen. Fast Refresh applies each change on save.
 
 ---
 
@@ -1021,8 +988,6 @@ Result: tap a product to open its details, then go back.
 <p align="center"><img src="docs/images/Section4Step1a.png" alt="Step 1: the list" height="500"></p>
 
 <p align="center"><img src="docs/images/Section4Step1b.png" alt="Step 1: the details screen" height="500"></p>
-
-Screen recording: [docs/images/Section4Step1.mov](docs/images/Section4Step1.mov)
 
 Optional: `npm test` should now show 14 tests passing.
 

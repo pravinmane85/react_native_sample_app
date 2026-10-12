@@ -40,9 +40,6 @@ yarn-error.*
 /ios
 /android
 
-# Workshop attendee test copies
-.workshop-attendee/
-
 # macOS
 .DS_Store
 
