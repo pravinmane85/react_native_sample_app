@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { products } from '../data/products';
 import { Product } from '../types/product';
 
-const FAVORITES_KEY = 'favoriteProductIds';
+const FAVOURITES_KEY = 'favouriteProductIds';
 
 export function getProducts(): Promise<Product[]> {
   return new Promise((resolve) => {
@@ -10,31 +10,31 @@ export function getProducts(): Promise<Product[]> {
   });
 }
 
-export function getFavoriteIds(): Promise<string[]> {
-  return loadFavoriteIds();
+export function getFavouriteIds(): Promise<string[]> {
+  return loadFavouriteIds();
 }
 
-export async function toggleFavorite(productId: string): Promise<string[]> {
-  const current = await loadFavoriteIds();
+export async function toggleFavourite(productId: string): Promise<string[]> {
+  const current = await loadFavouriteIds();
   const next = current.includes(productId)
     ? current.filter((id) => id !== productId)
     : [...current, productId];
-  await saveFavoriteIds(next);
+  await saveFavouriteIds(next);
   return next;
 }
 
-async function loadFavoriteIds(): Promise<string[]> {
+async function loadFavouriteIds(): Promise<string[]> {
   try {
-    const stored = await AsyncStorage.getItem(FAVORITES_KEY);
+    const stored = await AsyncStorage.getItem(FAVOURITES_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch {
     return [];
   }
 }
 
-async function saveFavoriteIds(ids: string[]): Promise<void> {
+async function saveFavouriteIds(ids: string[]): Promise<void> {
   try {
-    await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
+    await AsyncStorage.setItem(FAVOURITES_KEY, JSON.stringify(ids));
   } catch {
     // Saving favourites is best effort in this demo.
   }

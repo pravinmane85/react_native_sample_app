@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { getProducts } from '../services/productsService';
-import { phone, sim } from '../../test-utils/fixtures';
+import { phone, sim } from '../test/test-products';
 import ProductListScreen from './ProductListScreen';
 
 const mockNavigate = jest.fn();
@@ -16,7 +16,6 @@ jest.mock('@react-navigation/native', () => ({
 
 const mockGetProducts = getProducts as jest.MockedFunction<typeof getProducts>;
 
-// The test passes a fake `navigation`. `any` keeps this file valid before and after the screen takes props.
 const screenProps: any = { navigation: { navigate: mockNavigate } };
 
 const renderScreen = () => render(<ProductListScreen {...screenProps} />);
@@ -50,6 +49,13 @@ describe('<ProductListScreen />', () => {
     expect(screen.getByText('Test SIM Plan')).toBeTruthy();
   });
 
+  test('shows a message when no products match the search', async () => {
+    await renderScreen();
+    await screen.findByText('Test Phone X');
+    await fireEvent.changeText(screen.getByPlaceholderText('Search phones & SIM cards'), 'zzz');
+    expect(screen.getByText('No products match your search.')).toBeTruthy();
+  });
+
   test('opens the product details when a tile is pressed', async () => {
     await renderScreen();
     await fireEvent.press(await screen.findByText('Test Phone X'));
@@ -57,16 +63,29 @@ describe('<ProductListScreen />', () => {
   });
 
   test('shows favourites that were saved earlier', async () => {
-    await AsyncStorage.setItem('favoriteProductIds', JSON.stringify([phone.id]));
+    await AsyncStorage.setItem('favouriteProductIds', JSON.stringify([phone.id]));
     await renderScreen();
-    expect(await screen.findByLabelText('Remove Test Phone X from favorites')).toBeTruthy();
+    expect(await screen.findByLabelText('Favourite Test Phone X')).toBeSelected();
   });
 
   test('saves a favourite when the heart is tapped', async () => {
     await renderScreen();
-    await fireEvent.press(await screen.findByLabelText('Add Test Phone X to favorites'));
+    await fireEvent.press(await screen.findByLabelText('Favourite Test Phone X'));
     await waitFor(async () =>
-      expect(JSON.parse((await AsyncStorage.getItem('favoriteProductIds')) ?? '[]')).toEqual([phone.id])
+      expect(JSON.parse((await AsyncStorage.getItem('favouriteProductIds')) ?? '[]')).toEqual([phone.id])
     );
+  });
+
+  test('favourites a product with the screen reader action on the card', async () => {
+    await renderScreen();
+    const card = await screen.findByLabelText('View details for Test Phone X');
+    expect(card).toHaveProp('accessibilityActions', [{ name: 'favourite', label: 'Add Test Phone X to favourites' }]);
+
+    await fireEvent(card, 'accessibilityAction', { nativeEvent: { actionName: 'favourite' } });
+
+    await waitFor(async () =>
+      expect(JSON.parse((await AsyncStorage.getItem('favouriteProductIds')) ?? '[]')).toEqual([phone.id])
+    );
+    expect(screen.getByLabelText('Favourite Test Phone X')).toBeSelected();
   });
 });

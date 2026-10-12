@@ -1,5 +1,8 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { products } from '../data/products';
 import { Product } from '../types/product';
+
+const FAVOURITES_KEY = 'favouriteProductIds';
 
 export function getProducts(): Promise<Product[]> {
   return new Promise((resolve) => {
@@ -7,26 +10,21 @@ export function getProducts(): Promise<Product[]> {
   });
 }
 
-export function getFavoriteIds(): Promise<string[]> {
-  return loadFavoriteIds();
+export function getFavouriteIds(): Promise<string[]> {
+  return loadFavouriteIds();
 }
 
-export async function toggleFavorite(productId: string): Promise<string[]> {
-  const current = await loadFavoriteIds();
+export async function toggleFavourite(productId: string): Promise<string[]> {
+  const current = await loadFavouriteIds();
   const next = current.includes(productId)
     ? current.filter((id) => id !== productId)
     : [...current, productId];
-  await saveFavoriteIds(next);
+  await saveFavouriteIds(next);
   return next;
 }
 
-// TODO (Storage): use AsyncStorage from '@react-native-async-storage/async-storage'.
-// Store the ids as JSON under the key 'favoriteProductIds'.
-
-// TODO: return the saved ids. Return [] if nothing is saved or the data is corrupt.
-async function loadFavoriteIds(): Promise<string[]> {
+async function loadFavouriteIds(): Promise<string[]> {
   return [];
 }
 
-// TODO: save the ids. Do not throw if saving fails.
-async function saveFavoriteIds(ids: string[]): Promise<void> {}
+async function saveFavouriteIds(ids: string[]): Promise<void> {}

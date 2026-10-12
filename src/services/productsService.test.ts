@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getFavoriteIds, getProducts, toggleFavorite } from './productsService';
+import { getFavouriteIds, getProducts, toggleFavourite } from './productsService';
 
 describe('productsService', () => {
   beforeEach(async () => {
@@ -15,23 +15,23 @@ describe('productsService', () => {
   });
 
   test('starts with no favourites', async () => {
-    expect(await getFavoriteIds()).toEqual([]);
+    expect(await getFavouriteIds()).toEqual([]);
   });
 
-  test('toggleFavorite adds then removes a product', async () => {
-    expect(await toggleFavorite('a')).toEqual(['a']);
-    expect(await toggleFavorite('b')).toEqual(['a', 'b']);
-    expect(await toggleFavorite('a')).toEqual(['b']);
-    expect(await getFavoriteIds()).toEqual(['b']);
+  test('toggleFavourite adds then removes a product', async () => {
+    expect(await toggleFavourite('a')).toEqual(['a']);
+    expect(await toggleFavourite('b')).toEqual(['a', 'b']);
+    expect(await toggleFavourite('a')).toEqual(['b']);
+    expect(await getFavouriteIds()).toEqual(['b']);
   });
 
   test('saves favourites as JSON', async () => {
-    await toggleFavorite('a');
-    expect(JSON.parse((await AsyncStorage.getItem('favoriteProductIds')) ?? '[]')).toEqual(['a']);
+    await toggleFavourite('a');
+    expect(JSON.parse((await AsyncStorage.getItem('favouriteProductIds')) ?? '[]')).toEqual(['a']);
   });
 
   test('ignores corrupt saved data', async () => {
-    await AsyncStorage.setItem('favoriteProductIds', '{not json');
-    expect(await getFavoriteIds()).toEqual([]);
+    await AsyncStorage.setItem('favouriteProductIds', '{not json');
+    expect(await getFavouriteIds()).toEqual([]);
   });
 });

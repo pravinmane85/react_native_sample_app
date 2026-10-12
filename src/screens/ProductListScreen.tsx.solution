@@ -10,25 +10,26 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { getFavoriteIds, getProducts, toggleFavorite } from '../services/productsService';
+import { getFavouriteIds, getProducts, toggleFavourite } from '../services/productsService';
 import type { ProductListScreenProps } from '../types/navigation';
+import { colors } from '../theme/colors';
 import { Product } from '../types/product';
 
-export default function ProductListScreen({ navigation }: ProductListScreenProps) {
+export default function ProductListScreen({ navigation }: Readonly<ProductListScreenProps>) {
   const [query, setQuery] = useState<string>('');
   const [products, setProducts] = useState<Product[]>([]);
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
-  const loadProducts = () => {
+  function loadProducts() {
     setLoading(true);
     setError(false);
     getProducts()
       .then(setProducts)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  };
+  }
 
   useEffect(() => {
     loadProducts();
@@ -36,9 +37,44 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
 
   useFocusEffect(
     useCallback(() => {
-      getFavoriteIds().then(setFavoriteIds);
+      getFavouriteIds()
+        .then(setFavouriteIds)
+        .catch(() => { /* This would normally be handled by a toast or some user notification. Out of scope. */ });
     }, [])
   );
+
+  async function onFavouriteButtonPress(product: Product) {
+    const updatedFavouriteIds = await toggleFavourite(product.id);
+    setFavouriteIds(updatedFavouriteIds);
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator
+          size="large"
+          style={styles.loader}
+          accessibilityLabel="Loading products"
+        />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.message}>
+        <Text accessibilityRole="alert">Could not load products.</Text>
+        <Pressable
+          style={styles.retryButton}
+          onPress={loadProducts}
+          accessibilityRole="button"
+          accessibilityLabel="Retry loading products"
+        >
+          <Text style={styles.retryText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(query.trim().toLowerCase())
@@ -46,58 +82,69 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
 
   return (
     <View style={styles.container}>
+      <Text
+        style={styles.searchLabel}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+      >
+        Search phones
+      </Text>
       <TextInput
         value={query}
         onChangeText={setQuery}
         placeholder="Search phones & SIM cards"
+        placeholderTextColor={colors.textSecondary}
         keyboardType="default"
         accessibilityLabel="Search phones"
         style={styles.input}
       />
-      {loading ? (
-        <ActivityIndicator size="large" style={styles.loader} />
-      ) : error ? (
-        <View style={styles.message}>
-          <Text>Could not load products.</Text>
-          <Pressable style={styles.retryButton} onPress={loadProducts}>
-            <Text style={styles.retryText}>Retry</Text>
-          </Pressable>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredProducts}
-          extraData={favoriteIds}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
+      <FlatList
+        data={filteredProducts}
+        extraData={favouriteIds}
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={<Text style={styles.empty} accessibilityRole="alert">No products match your search.</Text>}
+        renderItem={({ item }) => {
+          const isFavourite = favouriteIds.includes(item.id);
+          const favouriteLabel = isFavourite
+            ? `Remove ${item.name} from favourites`
+            : `Add ${item.name} to favourites`;
+
+          return (
             <Pressable
               style={styles.card}
               onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
+              accessibilityRole="button"
+              accessibilityLabel={`View details for ${item.name}`}
+              // A screen reader treats the card as one element, so the heart inside it can't be
+              // reached. Offer favouriting as a custom action instead.
+              accessibilityActions={[{ name: 'favourite', label: favouriteLabel }]}
+              onAccessibilityAction={async (event) => {
+                if (event.nativeEvent.actionName === 'favourite') {
+                  await onFavouriteButtonPress(item);
+                }
+              }}
             >
               <Image
                 source={{ uri: item.image }}
                 style={styles.image}
-                accessibilityLabel={item.name}
               />
               <Text style={styles.name}>{item.name}</Text>
               <Pressable
-                style={styles.favoriteButton}
+                style={styles.favouriteButton}
                 hitSlop={8}
-                onPress={() => toggleFavorite(item.id).then(setFavoriteIds)}
+                onPress={() => onFavouriteButtonPress(item)}
                 accessibilityRole="button"
-                accessibilityLabel={
-                  favoriteIds.includes(item.id)
-                    ? `Remove ${item.name} from favorites`
-                    : `Add ${item.name} to favorites`
-                }
+                accessibilityLabel={`Favourite ${item.name}`}
+                accessibilityState={{ selected: isFavourite }}
               >
-                <Text style={[styles.favoriteIcon, favoriteIds.includes(item.id) && styles.favoriteIconActive]}>
-                  {favoriteIds.includes(item.id) ? '♥' : '♡'}
+                <Text style={[styles.favouriteIcon, isFavourite && styles.favouriteIconActive]}>
+                  {isFavourite ? '♥' : '♡'}
                 </Text>
               </Pressable>
             </Pressable>
-          )}
-        />
-      )}
+          );
+        }}
+      />
     </View>
   );
 }
@@ -105,13 +152,22 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
+  },
+  searchLabel: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
   input: {
-    height: 44,
-    margin: 16,
+    minHeight: 44,
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.borderStrong,
     borderRadius: 22,
     paddingHorizontal: 16,
   },
@@ -121,8 +177,8 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: 'white',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -135,27 +191,31 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 12,
     borderBottomLeftRadius: 12,
   },
-  name: { flex: 1, padding: 12, fontSize: 16, fontWeight: '600' },
-  favoriteButton: {
+  // paddingRight keeps long names clear of the heart in the top-right corner.
+  name: { flex: 1, padding: 12, paddingRight: 44, fontSize: 16, fontWeight: '600' },
+  empty: { padding: 16, fontSize: 16, color: colors.textSecondary },
+  favouriteButton: {
     position: 'absolute',
     top: 6,
     right: 6,
-    width: 28,
-    height: 28,
+    minWidth: 28,
+    minHeight: 28,
     borderRadius: 14,
     backgroundColor: 'rgba(255,255,255,0.85)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  favoriteIcon: { fontSize: 16, color: '#6B6B6B' },
-  favoriteIconActive: { color: '#E60000' },
+  favouriteIcon: { fontSize: 16, color: colors.textSecondary },
+  favouriteIconActive: { color: colors.primary },
   loader: { flex: 1 },
   message: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
   retryButton: {
-    backgroundColor: '#E60000',
+    backgroundColor: colors.primary,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
   },
-  retryText: { color: 'white', fontWeight: '600' },
+  retryText: { color: colors.badgeText, fontWeight: '600' },
 });

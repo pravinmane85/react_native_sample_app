@@ -1,6 +1,5 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React from 'react';
 import type { RootStackParamList } from './types/navigation';
 import ProductDetailsScreen from './screens/ProductDetailsScreen';
 import ProductListScreen from './screens/ProductListScreen';
@@ -20,8 +19,16 @@ export default function App() {
           contentStyle: { backgroundColor: colors.background },
         }}
       >
-        <Stack.Screen name="ProductList" component={ProductListScreen} options={{ title: 'Phones & SIM cards' }} />
-        <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} options={{ title: '' }} />
+        <Stack.Screen
+          name="ProductList"
+          component={ProductListScreen}
+          options={{ title: 'Phones & SIM cards' }}
+        />
+        <Stack.Screen
+          name="ProductDetails"
+          component={ProductDetailsScreen}
+          options={{ title: 'Product details' }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

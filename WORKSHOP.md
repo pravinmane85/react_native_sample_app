@@ -1,6 +1,6 @@
 # Workshop: Phones & SIM Cards App
 
-## Section 1: Installation (10 min)
+## Exercise 1: Installation
 
 This is an interactive workshop. Please set up before the session. You only need to pick **one** of these options:
 
@@ -67,7 +67,7 @@ You should see a header, "Phones & SIM cards", above an empty screen. Fast Refre
 
 ---
 
-## Section 2: Build a product card (15 min)
+## Exercise 2: Build a product card
 
 Build a product card from React Native's core components: `View`, `Text`, `Image` and `StyleSheet`.
 
@@ -77,7 +77,7 @@ Build a product card from React Native's core components: `View`, `Text`, `Image
 
 Open `src/screens/ProductListScreen.tsx`.
 
-Optional: `npm test` verifies your work. Tests for later sections fail until you reach them. After this section, 9 tests pass.
+Optional: `npm test` verifies your work. Tests for later exercises fail until you reach them. After this exercise, 9 tests pass.
 
 Each step shows the whole file after the change. Added code is marked with `NEW` comments, which you can delete. Where most of the file changes, nothing is marked.
 
@@ -152,11 +152,13 @@ Lay the image and text out as a single card with a shadow.
 - Shadows are platform-specific: iOS uses the `shadow-` styles (`shadowColor`, `shadowOffset`, `shadowOpacity`, `shadowRadius`) and Android uses `elevation`.
 - Dimensions are unitless, in density-independent points. 
 - `flex: 1` fills the remaining space in the parent.
+- Colours come from the theme file `src/theme/colors.ts`, so every colour is defined in one place.
 
 **`src/screens/ProductListScreen.tsx`**
 
 ```tsx
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { colors } from '../theme/colors';
 
 export default function ProductListScreen() {
   return (
@@ -175,7 +177,7 @@ export default function ProductListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
   },
   card: {
     flexDirection: 'row',
@@ -183,8 +185,8 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: 'white',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -212,9 +214,9 @@ Result:
 
 ---
 
-## Section 3: Load the products (15 min)
+## Exercise 3: Load the products
 
-Fetch the products and render them in a list, with loading and error states. This section needs the repo; it does not work in Expo Snack.
+Fetch the products and render them in a list, with loading and error states. This exercise needs the repo; it does not work in Expo Snack.
 
 ---
 
@@ -233,6 +235,7 @@ The data layer is already provided:
 
 ```tsx
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native'; //UPDATED
+import { colors } from '../theme/colors';
 
 // NEW
 import { useEffect, useState } from 'react';
@@ -273,7 +276,7 @@ export default function ProductListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
   },
   card: {
     flexDirection: 'row',
@@ -281,8 +284,8 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: 'white',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -309,12 +312,15 @@ Result:
 
 Real data takes time, so show a spinner while it loads. `ActivityIndicator` is the native spinner. `size="large"` makes it bigger, and `flex: 1` centres it in the available space.
 
+While `loading` is true, return the spinner on its own. A component can return early like this, which keeps the main `return` for the finished list.
+
 **`src/screens/ProductListScreen.tsx`**
 
 ```tsx
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native';  // NEW
 import { getProducts } from '../services/productsService';
+import { colors } from '../theme/colors';
 import { Product } from '../types/product';
 
 export default function ProductListScreen() {
@@ -329,27 +335,31 @@ export default function ProductListScreen() {
     // END NEW
   }, []);
 
+  // NEW
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" style={styles.loader} />
+      </View>
+    );
+  }
+  // END NEW
+
   return (
     <View style={styles.container}>
-      {/* NEW */}
-      {loading ? (
-        <ActivityIndicator size="large" style={styles.loader} />
-      ) : (
-        <FlatList
-          data={products}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Image
-                source={{ uri: item.image }}
-                style={styles.image}
-              />
-              <Text style={styles.name}>{item.name}</Text>
-            </View>
-          )}
-        />
-      )}
-      {/* END NEW */}
+      <FlatList
+        data={products}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Image
+              source={{ uri: item.image }}
+              style={styles.image}
+            />
+            <Text style={styles.name}>{item.name}</Text>
+          </View>
+        )}
+      />
     </View>
   );
 }
@@ -357,7 +367,7 @@ export default function ProductListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
   },
   card: {
     flexDirection: 'row',
@@ -365,8 +375,8 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: 'white',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -392,7 +402,7 @@ Result:
 
 ### Step 3: Errors
 
-Loading can also fail. Show an error message and a **Retry** button. `Pressable` is the touch wrapper, covered in the next section.
+Loading can also fail. Return an error message and a **Retry** button in the same way. `Pressable` is the touch wrapper, covered in the next exercise.
 
 **Try it:** to see the error state, temporarily replace the body of `getProducts` in `productsService.ts` with the following, then restore it:
 
@@ -408,6 +418,7 @@ return new Promise((_resolve, reject) => {
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';  // UPDATED
 import { getProducts } from '../services/productsService';
+import { colors } from '../theme/colors';
 import { Product } from '../types/product';
 
 export default function ProductListScreen() {
@@ -416,48 +427,56 @@ export default function ProductListScreen() {
   // NEW
   const [error, setError] = useState<boolean>(false);
 
-  const loadProducts = () => {
+  function loadProducts() {
     setLoading(true);
     setError(false);
     getProducts()
       .then(setProducts)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  };
+  }
   // END NEW
 
   useEffect(() => {
     loadProducts();  // UPDATED
   }, []);
 
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" style={styles.loader} />
+      </View>
+    );
+  }
+
+  // NEW
+  if (error) {
+    return (
+      <View style={styles.message}>
+        <Text>Could not load products.</Text>
+        <Pressable style={styles.retryButton} onPress={loadProducts}>
+          <Text style={styles.retryText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
+  // END NEW
+
   return (
     <View style={styles.container}>
-      {loading ? (
-        <ActivityIndicator size="large" style={styles.loader} />
-      // NEW
-      ) : error ? (
-        <View style={styles.message}>
-          <Text>Could not load products.</Text>
-          <Pressable style={styles.retryButton} onPress={loadProducts}>
-            <Text style={styles.retryText}>Retry</Text>
-          </Pressable>
-        </View>
-      // END NEW
-      ) : (
-        <FlatList
-          data={products}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Image
-                source={{ uri: item.image }}
-                style={styles.image}
-              />
-              <Text style={styles.name}>{item.name}</Text>
-            </View>
-          )}
-        />
-      )}
+      <FlatList
+        data={products}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Image
+              source={{ uri: item.image }}
+              style={styles.image}
+            />
+            <Text style={styles.name}>{item.name}</Text>
+          </View>
+        )}
+      />
     </View>
   );
 }
@@ -465,7 +484,7 @@ export default function ProductListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
   },
   card: {
     flexDirection: 'row',
@@ -473,8 +492,8 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: 'white',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -492,12 +511,14 @@ const styles = StyleSheet.create({
   // NEW
   message: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
   retryButton: {
-    backgroundColor: '#E60000',
+    backgroundColor: colors.primary,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
   },
-  retryText: { color: 'white', fontWeight: '600' },
+  retryText: { color: colors.badgeText, fontWeight: '600' },
   // END NEW
 });
 ```
@@ -510,9 +531,9 @@ Optional: `npm test` should now show 11 tests passing.
 
 ---
 
-## Section 4: Add interactivity (25 min)
+## Exercise 4: Add interactivity
 
-Add search to the list: a text field, state and accessibility. This section needs the repo; it does not work in Expo Snack.
+Add search to the list: a text field and state. This exercise needs the repo; it does not work in Expo Snack.
 
 ---
 
@@ -543,6 +564,7 @@ import {
 } from 'react-native';
 // END NEW
 import { getProducts } from '../services/productsService';
+import { colors } from '../theme/colors';
 import { Product } from '../types/product';
 
 export default function ProductListScreen() {
@@ -551,18 +573,37 @@ export default function ProductListScreen() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
-  const loadProducts = () => {
+  function loadProducts() {
     setLoading(true);
     setError(false);
     getProducts()
       .then(setProducts)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  };
+  }
 
   useEffect(() => {
     loadProducts();
   }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" style={styles.loader} />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.message}>
+        <Text>Could not load products.</Text>
+        <Pressable style={styles.retryButton} onPress={loadProducts}>
+          <Text style={styles.retryText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   // NEW
   const filteredProducts = products.filter((product) =>
@@ -581,30 +622,19 @@ export default function ProductListScreen() {
         style={styles.input}
       />
       {/* END NEW */}
-      {loading ? (
-        <ActivityIndicator size="large" style={styles.loader} />
-      ) : error ? (
-        <View style={styles.message}>
-          <Text>Could not load products.</Text>
-          <Pressable style={styles.retryButton} onPress={loadProducts}>
-            <Text style={styles.retryText}>Retry</Text>
-          </Pressable>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredProducts}  /* UPDATED */
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Image
-                source={{ uri: item.image }}
-                style={styles.image}
-              />
-              <Text style={styles.name}>{item.name}</Text>
-            </View>
-          )}
-        />
-      )}
+      <FlatList
+        data={filteredProducts}  /* UPDATED */
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Image
+              source={{ uri: item.image }}
+              style={styles.image}
+            />
+            <Text style={styles.name}>{item.name}</Text>
+          </View>
+        )}
+      />
     </View>
   );
 }
@@ -612,14 +642,14 @@ export default function ProductListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
   // NEW
   },
   input: {
-    height: 44,
+    minHeight: 44,
     margin: 16,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.borderStrong,
     borderRadius: 22,
     paddingHorizontal: 16,
   // END NEW
@@ -630,8 +660,8 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: 'white',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -648,12 +678,14 @@ const styles = StyleSheet.create({
   loader: { flex: 1 },
   message: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
   retryButton: {
-    backgroundColor: '#E60000',
+    backgroundColor: colors.primary,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
   },
-  retryText: { color: 'white', fontWeight: '600' },
+  retryText: { color: colors.badgeText, fontWeight: '600' },
 });
 ```
 
@@ -663,15 +695,27 @@ Result:
 
 ---
 
-### Step 2: Accessibility
+## Exercise 5: Accessibility
 
-Add accessibility labels and roles for screen readers. Optional, on a physical phone only:
+Make the list usable with a screen reader: VoiceOver on iOS and TalkBack on Android. This exercise needs the repo; it does not work in Expo Snack.
+
+---
+
+### Step 1: Accessibility labels
+
+A screen reader reads out what is on the screen. The search box, the spinner and the product images have no visible text for it to read, so give each an `accessibilityLabel`. The screen reader reads the label instead. An image also needs `accessible`, otherwise iOS skips it.
+
+The Retry button gets `accessibilityRole="button"` and a label that says what it does. The error message gets `accessibilityRole="alert"`, which marks it as important.
+
+Optional, on a physical phone only:
 
 - iOS: Settings > Accessibility > VoiceOver.
 - Android: Settings > Accessibility > TalkBack > Use TalkBack.
 - Both change how touch works: you select an item with one tap and activate it with a double-tap. Turn them off in the same settings screen.
 
 Not applicable on a simulator or an emulator.
+
+Optional, if you use Visual Studio Code: install the [axe Accessibility Linter](https://marketplace.visualstudio.com/items?itemName=deque-systems.vscode-axe-linter) extension. It flags accessibility violations in your code as you type, for example an image with no label. Open `src/screens/ProductListScreen.tsx` and look for squiggly underlines, or open the Problems panel (View > Problems). The repo's `axe-linter.yml` turns on the React Native rules. If nothing is flagged, reload the window (Command Palette > Developer: Reload Window).
 
 **`src/screens/ProductListScreen.tsx`**
 
@@ -688,6 +732,7 @@ import {
   View,
 } from 'react-native';
 import { getProducts } from '../services/productsService';
+import { colors } from '../theme/colors';
 import { Product } from '../types/product';
 
 export default function ProductListScreen() {
@@ -696,18 +741,46 @@ export default function ProductListScreen() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
-  const loadProducts = () => {
+  function loadProducts() {
     setLoading(true);
     setError(false);
     getProducts()
       .then(setProducts)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  };
+  }
 
   useEffect(() => {
     loadProducts();
   }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator
+          size="large"
+          style={styles.loader}
+          accessibilityLabel="Loading products"  /* NEW */
+        />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.message}>
+        <Text accessibilityRole="alert">Could not load products.</Text>
+        <Pressable
+          style={styles.retryButton}
+          onPress={loadProducts}
+          accessibilityRole="button"  /* NEW */
+          accessibilityLabel="Retry loading products"  /* NEW */
+        >
+          <Text style={styles.retryText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(query.trim().toLowerCase())
@@ -723,31 +796,21 @@ export default function ProductListScreen() {
         accessibilityLabel="Search phones"  /* NEW */
         style={styles.input}
       />
-      {loading ? (
-        <ActivityIndicator size="large" style={styles.loader} />
-      ) : error ? (
-        <View style={styles.message}>
-          <Text>Could not load products.</Text>
-          <Pressable style={styles.retryButton} onPress={loadProducts}>
-            <Text style={styles.retryText}>Retry</Text>
-          </Pressable>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredProducts}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Image
-                source={{ uri: item.image }}
-                style={styles.image}
-                accessibilityLabel={item.name}  /* NEW */
-              />
-              <Text style={styles.name}>{item.name}</Text>
-            </View>
-          )}
-        />
-      )}
+      <FlatList
+        data={filteredProducts}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Image
+              source={{ uri: item.image }}
+              style={styles.image}
+              accessible  /* NEW */
+              accessibilityLabel={item.name}  /* NEW */
+            />
+            <Text style={styles.name}>{item.name}</Text>
+          </View>
+        )}
+      />
     </View>
   );
 }
@@ -755,13 +818,13 @@ export default function ProductListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
   },
   input: {
-    height: 44,
+    minHeight: 44,
     margin: 16,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.borderStrong,
     borderRadius: 22,
     paddingHorizontal: 16,
   },
@@ -771,8 +834,8 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: 'white',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -789,12 +852,14 @@ const styles = StyleSheet.create({
   loader: { flex: 1 },
   message: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
   retryButton: {
-    backgroundColor: '#E60000',
+    backgroundColor: colors.primary,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
   },
-  retryText: { color: 'white', fontWeight: '600' },
+  retryText: { color: colors.badgeText, fontWeight: '600' },
 });
 ```
 
@@ -802,9 +867,209 @@ Optional: `npm test` should now show 12 tests passing.
 
 ---
 
-## Section 5: Navigation (10 min)
+### Step 2: A visible label and an empty state
 
-Navigate from the list to a product's details. This section needs the repo; it does not work in Expo Snack.
+Three more changes to the search.
+
+- **A visible label.** A placeholder disappears as soon as you type, so add a label above the box that stays. The input already has an `accessibilityLabel`, so hide the visible one from screen readers with `accessibilityElementsHidden` (iOS) and `importantForAccessibility="no"` (Android). Otherwise it is read twice.
+- **Contrast.** The default placeholder colour is too pale to read easily. `placeholderTextColor` takes a theme colour with enough contrast.
+- **An empty state.** When the search matches nothing, the list is blank and a screen reader user hears nothing. `ListEmptyComponent` shows a message instead, and `accessibilityRole="alert"` marks it as important.
+
+**`src/screens/ProductListScreen.tsx`**
+
+```tsx
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { getProducts } from '../services/productsService';
+import { colors } from '../theme/colors';
+import { Product } from '../types/product';
+
+export default function ProductListScreen() {
+  const [query, setQuery] = useState<string>('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
+
+  function loadProducts() {
+    setLoading(true);
+    setError(false);
+    getProducts()
+      .then(setProducts)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator
+          size="large"
+          style={styles.loader}
+          accessibilityLabel="Loading products"
+        />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.message}>
+        <Text accessibilityRole="alert">Could not load products.</Text>
+        <Pressable
+          style={styles.retryButton}
+          onPress={loadProducts}
+          accessibilityRole="button"
+          accessibilityLabel="Retry loading products"
+        >
+          <Text style={styles.retryText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(query.trim().toLowerCase())
+  );
+
+  return (
+    <View style={styles.container}>
+      {/* NEW */}
+      {/* A visible label that stays on screen while typing. The input has its own label, so screen readers skip this one. */}
+      <Text
+        style={styles.searchLabel}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+      >
+        Search phones
+      </Text>
+      {/* END NEW */}
+      <TextInput
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Search phones & SIM cards"
+        placeholderTextColor={colors.textSecondary}  /* NEW */
+        keyboardType="default"
+        accessibilityLabel="Search phones"
+        style={styles.input}
+      />
+      <FlatList
+        data={filteredProducts}
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={<Text style={styles.empty} accessibilityRole="alert">No products match your search.</Text>}  /* NEW */
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Image
+              source={{ uri: item.image }}
+              style={styles.image}
+              accessible
+              accessibilityLabel={item.name}
+            />
+            <Text style={styles.name}>{item.name}</Text>
+          </View>
+        )}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  // NEW
+  searchLabel: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  // END NEW
+  input: {
+    minHeight: 44,
+    marginHorizontal: 16,  // UPDATED
+    marginTop: 8,  // UPDATED
+    marginBottom: 16,  // UPDATED
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    borderRadius: 22,
+    paddingHorizontal: 16,
+  },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  image: {
+    width: 110,
+    height: 110,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+  },
+  name: { flex: 1, padding: 12, fontSize: 16, fontWeight: '600' },
+  // NEW
+  empty: { padding: 16, fontSize: 16, color: colors.textSecondary },
+  // END NEW
+  loader: { flex: 1 },
+  message: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
+  retryButton: {
+    backgroundColor: colors.primary,
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryText: { color: colors.badgeText, fontWeight: '600' },
+});
+```
+
+---
+
+### Step 3: Other accessibility techniques
+
+The finished app uses a few more techniques. You do not need to add them now.
+
+- **Roles.** `accessibilityRole` says what an element is: `"button"` for the cards and the Retry button, `"header"` for headings, and `"alert"` for error messages.
+- **Labels that describe the action.** A card is labelled "View details for Samsung Galaxy S25", not just the name.
+- **Grouping.** A `Pressable` is read as one element, so anything inside it cannot be reached separately. Keep that in mind when you put a button inside a card.
+- **Text that grows.** `minHeight` and `minWidth` instead of fixed `height` and `width` stop large text sizes being clipped. The search box, the Retry button and the heart use them.
+- **Contrast.** The theme colours meet the WCAG AA contrast ratios: 4.5:1 for text and 3:1 for borders and icons.
+
+These come with the favourites in Exercise 7:
+
+- **`hitSlop`** makes a small button easier to hit.
+- **`accessibilityState`** tells the screen reader about a state such as selected, checked, disabled or busy.
+- **`accessibilityActions`** adds a custom action to the card, so a screen reader user can favourite a product without reaching the heart.
+
+---
+
+## Exercise 6: Navigation
+
+Navigate from the list to a product's details. This exercise needs the repo; it does not work in Expo Snack.
 
 ---
 
@@ -842,7 +1107,7 @@ export default function App() {
 - Each `Stack.Screen` registers one screen. `name` is the route name you pass to `navigation.navigate`, `component` is the screen, and `options.title` is the header text.
 - The navigator passes `navigation` and `route` to every screen as props. That is how the list screen can open the details screen.
 
-The heart on the details screen does not save yet. That comes in Section 6.
+The heart on the details screen does not save yet. That comes in Exercise 7.
 
 On Android, the system back gesture or button returns to the list.
 
@@ -850,7 +1115,7 @@ Each screen receives a `navigation` prop. `navigation.navigate('ProductDetails',
 
 The list screen's props type, `ProductListScreenProps`, is already defined in `src/types/navigation.ts`, next to `RootStackParamList`.
 
-Then make the card a `Pressable` that navigates on press:
+Then make the card a `Pressable` that navigates on press. A `Pressable` is read as one element, so the image no longer needs its own `accessible` or `accessibilityLabel`: the screen reader reads the product name from the card.
 
 **`src/screens/ProductListScreen.tsx`**
 
@@ -868,26 +1133,55 @@ import {
 } from 'react-native';
 import { getProducts } from '../services/productsService';
 import type { ProductListScreenProps } from '../types/navigation';  // NEW
+import { colors } from '../theme/colors';
 import { Product } from '../types/product';
 
-export default function ProductListScreen({ navigation }: ProductListScreenProps) {  // UPDATED
+export default function ProductListScreen({ navigation }: Readonly<ProductListScreenProps>) {  // UPDATED
   const [query, setQuery] = useState<string>('');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
-  const loadProducts = () => {
+  function loadProducts() {
     setLoading(true);
     setError(false);
     getProducts()
       .then(setProducts)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  };
+  }
 
   useEffect(() => {
     loadProducts();
   }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator
+          size="large"
+          style={styles.loader}
+          accessibilityLabel="Loading products"
+        />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.message}>
+        <Text accessibilityRole="alert">Could not load products.</Text>
+        <Pressable
+          style={styles.retryButton}
+          onPress={loadProducts}
+          accessibilityRole="button"
+          accessibilityLabel="Retry loading products"
+        >
+          <Text style={styles.retryText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(query.trim().toLowerCase())
@@ -895,44 +1189,41 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
 
   return (
     <View style={styles.container}>
+      <Text
+        style={styles.searchLabel}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+      >
+        Search phones
+      </Text>
       <TextInput
         value={query}
         onChangeText={setQuery}
         placeholder="Search phones & SIM cards"
+        placeholderTextColor={colors.textSecondary}
         keyboardType="default"
         accessibilityLabel="Search phones"
         style={styles.input}
       />
-      {loading ? (
-        <ActivityIndicator size="large" style={styles.loader} />
-      ) : error ? (
-        <View style={styles.message}>
-          <Text>Could not load products.</Text>
-          <Pressable style={styles.retryButton} onPress={loadProducts}>
-            <Text style={styles.retryText}>Retry</Text>
-          </Pressable>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredProducts}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            // NEW
-            <Pressable
-              style={styles.card}
-              onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
-            >
-            {/* END NEW */}
-              <Image
-                source={{ uri: item.image }}
-                style={styles.image}
-                accessibilityLabel={item.name}
-              />
-              <Text style={styles.name}>{item.name}</Text>
-            </Pressable>  // UPDATED
-          )}
-        />
-      )}
+      <FlatList
+        data={filteredProducts}
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={<Text style={styles.empty} accessibilityRole="alert">No products match your search.</Text>}
+        renderItem={({ item }) => (
+          // NEW
+          <Pressable
+            style={styles.card}
+            onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
+          >
+          {/* END NEW */}
+            <Image
+              source={{ uri: item.image }}
+              style={styles.image}
+            />
+            <Text style={styles.name}>{item.name}</Text>
+          </Pressable>  // UPDATED
+        )}
+      />
     </View>
   );
 }
@@ -940,13 +1231,22 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
+  },
+  searchLabel: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
   input: {
-    height: 44,
-    margin: 16,
+    minHeight: 44,
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.borderStrong,
     borderRadius: 22,
     paddingHorizontal: 16,
   },
@@ -956,8 +1256,8 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: 'white',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -971,15 +1271,18 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 12,
   },
   name: { flex: 1, padding: 12, fontSize: 16, fontWeight: '600' },
+  empty: { padding: 16, fontSize: 16, color: colors.textSecondary },
   loader: { flex: 1 },
   message: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
   retryButton: {
-    backgroundColor: '#E60000',
+    backgroundColor: colors.primary,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
   },
-  retryText: { color: 'white', fontWeight: '600' },
+  retryText: { color: colors.badgeText, fontWeight: '600' },
 });
 ```
 
@@ -993,11 +1296,11 @@ Optional: `npm test` should now show 14 tests passing.
 
 ---
 
-## Section 6: Storage (15 min)
+## Exercise 7: Storage
 
-Persist favourites across app restarts. The details screen already uses them. This section needs the repo; it does not work in Expo Snack.
+Persist favourites across app restarts. The details screen already uses them. This exercise needs the repo; it does not work in Expo Snack.
 
-The service in `src/services/productsService.ts` already has the favourites functions. `getFavoriteIds()` reads the saved ids, and `toggleFavorite(id)` adds or removes an id and saves the new list. They use two storage helpers at the bottom of the file, which you write in Step 1. You also build the heart and the list wiring.
+The service in `src/services/productsService.ts` already has the favourites functions. `getFavouriteIds()` reads the saved ids, and `toggleFavourite(id)` adds or removes an id and saves the new list. They use two storage helpers at the bottom of the file, which you write in Step 1. You also build the heart, the list wiring and the accessibility for both.
 
 ---
 
@@ -1005,7 +1308,7 @@ The service in `src/services/productsService.ts` already has the favourites func
 
 `AsyncStorage` is an async key-value store, comparable to `localStorage`. It is already installed and stores strings only, so the ids are saved as JSON.
 
-`loadFavoriteIds` and `saveFavoriteIds` at the bottom of the file are stubs. Until you fill them in, `toggleFavorite` has nothing to read, so only the last heart you tap stays filled.
+`loadFavouriteIds` and `saveFavouriteIds` at the bottom of the file are stubs. Until you fill them in, `toggleFavourite` has nothing to read, so only the last heart you tap stays filled.
 
 **`src/services/productsService.ts`**
 
@@ -1014,7 +1317,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';  // NEW
 import { products } from '../data/products';
 import { Product } from '../types/product';
 
-const FAVORITES_KEY = 'favoriteProductIds';  // NEW
+const FAVOURITES_KEY = 'favouriteProductIds';  // NEW
 
 export function getProducts(): Promise<Product[]> {
   return new Promise((resolve) => {
@@ -1022,23 +1325,23 @@ export function getProducts(): Promise<Product[]> {
   });
 }
 
-export function getFavoriteIds(): Promise<string[]> {
-  return loadFavoriteIds();
+export function getFavouriteIds(): Promise<string[]> {
+  return loadFavouriteIds();
 }
 
-export async function toggleFavorite(productId: string): Promise<string[]> {
-  const current = await loadFavoriteIds();
+export async function toggleFavourite(productId: string): Promise<string[]> {
+  const current = await loadFavouriteIds();
   const next = current.includes(productId)
     ? current.filter((id) => id !== productId)
     : [...current, productId];
-  await saveFavoriteIds(next);
+  await saveFavouriteIds(next);
   return next;
 }
 
-async function loadFavoriteIds(): Promise<string[]> {
+async function loadFavouriteIds(): Promise<string[]> {
   // NEW
   try {
-    const stored = await AsyncStorage.getItem(FAVORITES_KEY);
+    const stored = await AsyncStorage.getItem(FAVOURITES_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch {
     return [];
@@ -1047,9 +1350,9 @@ async function loadFavoriteIds(): Promise<string[]> {
 }
 
 // NEW
-async function saveFavoriteIds(ids: string[]): Promise<void> {
+async function saveFavouriteIds(ids: string[]): Promise<void> {
   try {
-    await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
+    await AsyncStorage.setItem(FAVOURITES_KEY, JSON.stringify(ids));
   } catch {
     // Saving favourites is best effort in this demo.
   }
@@ -1062,6 +1365,8 @@ async function saveFavoriteIds(ids: string[]): Promise<void> {
 ### Step 2: The heart
 
 Add a heart button to each card. The inner `Pressable` handles the touch, so the card's `onPress` does not fire. Tapping the heart toggles the favourite and saves it. `FlatList` is a pure component, so `extraData` tells it to re-render when the favourites change.
+
+The heart is a toggle, so it also gets an `accessibilityState`. `selected` says whether it is on, and a screen reader tells the user when the favourite is selected. The label stays the same and only the state changes. The other states are `checked`, `disabled`, `busy` and `expanded`.
 
 **`src/screens/ProductListScreen.tsx`**
 
@@ -1077,29 +1382,58 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { getProducts, toggleFavorite } from '../services/productsService';  // UPDATED
+import { getProducts, toggleFavourite } from '../services/productsService';  // UPDATED
 import type { ProductListScreenProps } from '../types/navigation';
+import { colors } from '../theme/colors';
 import { Product } from '../types/product';
 
-export default function ProductListScreen({ navigation }: ProductListScreenProps) {
+export default function ProductListScreen({ navigation }: Readonly<ProductListScreenProps>) {
   const [query, setQuery] = useState<string>('');
   const [products, setProducts] = useState<Product[]>([]);
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);  // NEW
+  const [favouriteIds, setFavouriteIds] = useState<string[]>([]);  // NEW
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
-  const loadProducts = () => {
+  function loadProducts() {
     setLoading(true);
     setError(false);
     getProducts()
       .then(setProducts)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  };
+  }
 
   useEffect(() => {
     loadProducts();
   }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator
+          size="large"
+          style={styles.loader}
+          accessibilityLabel="Loading products"
+        />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.message}>
+        <Text accessibilityRole="alert">Could not load products.</Text>
+        <Pressable
+          style={styles.retryButton}
+          onPress={loadProducts}
+          accessibilityRole="button"
+          accessibilityLabel="Retry loading products"
+        >
+          <Text style={styles.retryText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(query.trim().toLowerCase())
@@ -1107,29 +1441,33 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
 
   return (
     <View style={styles.container}>
+      <Text
+        style={styles.searchLabel}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+      >
+        Search phones
+      </Text>
       <TextInput
         value={query}
         onChangeText={setQuery}
         placeholder="Search phones & SIM cards"
+        placeholderTextColor={colors.textSecondary}
         keyboardType="default"
         accessibilityLabel="Search phones"
         style={styles.input}
       />
-      {loading ? (
-        <ActivityIndicator size="large" style={styles.loader} />
-      ) : error ? (
-        <View style={styles.message}>
-          <Text>Could not load products.</Text>
-          <Pressable style={styles.retryButton} onPress={loadProducts}>
-            <Text style={styles.retryText}>Retry</Text>
-          </Pressable>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredProducts}
-          extraData={favoriteIds}  /* NEW */
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
+      <FlatList
+        data={filteredProducts}
+        extraData={favouriteIds}  /* NEW */
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={<Text style={styles.empty} accessibilityRole="alert">No products match your search.</Text>}
+        renderItem={({ item }) => {  /* UPDATED */
+          // NEW
+          const isFavourite = favouriteIds.includes(item.id);
+          // END NEW
+
+          return (
             <Pressable
               style={styles.card}
               onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
@@ -1137,29 +1475,25 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
               <Image
                 source={{ uri: item.image }}
                 style={styles.image}
-                accessibilityLabel={item.name}
               />
               <Text style={styles.name}>{item.name}</Text>
               {/* NEW */}
               <Pressable
-                style={styles.favoriteButton}
-                onPress={() => toggleFavorite(item.id).then(setFavoriteIds)}
+                style={styles.favouriteButton}
+                onPress={() => toggleFavourite(item.id).then(setFavouriteIds)}
                 accessibilityRole="button"
-                accessibilityLabel={
-                  favoriteIds.includes(item.id)
-                    ? `Remove ${item.name} from favorites`
-                    : `Add ${item.name} to favorites`
-                }
+                accessibilityLabel={`Favourite ${item.name}`}
+                accessibilityState={{ selected: isFavourite }}
               >
-                <Text style={[styles.favoriteIcon, favoriteIds.includes(item.id) && styles.favoriteIconActive]}>
-                  {favoriteIds.includes(item.id) ? '♥' : '♡'}
+                <Text style={[styles.favouriteIcon, isFavourite && styles.favouriteIconActive]}>
+                  {isFavourite ? '♥' : '♡'}
                 </Text>
               </Pressable>
               {/* END NEW */}
             </Pressable>
-          )}
-        />
-      )}
+          );
+        }}
+      />
     </View>
   );
 }
@@ -1167,13 +1501,22 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
+  },
+  searchLabel: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
   input: {
-    height: 44,
-    margin: 16,
+    minHeight: 44,
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.borderStrong,
     borderRadius: 22,
     paddingHorizontal: 16,
   },
@@ -1183,8 +1526,8 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: 'white',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -1197,31 +1540,35 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 12,
     borderBottomLeftRadius: 12,
   },
-  name: { flex: 1, padding: 12, fontSize: 16, fontWeight: '600' },
+  // paddingRight keeps long names clear of the heart in the top-right corner.
+  name: { flex: 1, padding: 12, paddingRight: 44, fontSize: 16, fontWeight: '600' },  // UPDATED
+  empty: { padding: 16, fontSize: 16, color: colors.textSecondary },
   // NEW
-  favoriteButton: {
+  favouriteButton: {
     position: 'absolute',
     top: 6,
     right: 6,
-    width: 28,
-    height: 28,
+    minWidth: 28,
+    minHeight: 28,
     borderRadius: 14,
     backgroundColor: 'rgba(255,255,255,0.85)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  favoriteIcon: { fontSize: 16, color: '#6B6B6B' },
-  favoriteIconActive: { color: '#E60000' },
+  favouriteIcon: { fontSize: 16, color: colors.textSecondary },
+  favouriteIconActive: { color: colors.primary },
   // END NEW
   loader: { flex: 1 },
   message: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
   retryButton: {
-    backgroundColor: '#E60000',
+    backgroundColor: colors.primary,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
   },
-  retryText: { color: 'white', fontWeight: '600' },
+  retryText: { color: colors.badgeText, fontWeight: '600' },
 });
 ```
 
@@ -1249,29 +1596,58 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { getProducts, toggleFavorite } from '../services/productsService';
+import { getProducts, toggleFavourite } from '../services/productsService';
 import type { ProductListScreenProps } from '../types/navigation';
+import { colors } from '../theme/colors';
 import { Product } from '../types/product';
 
-export default function ProductListScreen({ navigation }: ProductListScreenProps) {
+export default function ProductListScreen({ navigation }: Readonly<ProductListScreenProps>) {
   const [query, setQuery] = useState<string>('');
   const [products, setProducts] = useState<Product[]>([]);
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
-  const loadProducts = () => {
+  function loadProducts() {
     setLoading(true);
     setError(false);
     getProducts()
       .then(setProducts)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  };
+  }
 
   useEffect(() => {
     loadProducts();
   }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator
+          size="large"
+          style={styles.loader}
+          accessibilityLabel="Loading products"
+        />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.message}>
+        <Text accessibilityRole="alert">Could not load products.</Text>
+        <Pressable
+          style={styles.retryButton}
+          onPress={loadProducts}
+          accessibilityRole="button"
+          accessibilityLabel="Retry loading products"
+        >
+          <Text style={styles.retryText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(query.trim().toLowerCase())
@@ -1279,29 +1655,31 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
 
   return (
     <View style={styles.container}>
+      <Text
+        style={styles.searchLabel}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+      >
+        Search phones
+      </Text>
       <TextInput
         value={query}
         onChangeText={setQuery}
         placeholder="Search phones & SIM cards"
+        placeholderTextColor={colors.textSecondary}
         keyboardType="default"
         accessibilityLabel="Search phones"
         style={styles.input}
       />
-      {loading ? (
-        <ActivityIndicator size="large" style={styles.loader} />
-      ) : error ? (
-        <View style={styles.message}>
-          <Text>Could not load products.</Text>
-          <Pressable style={styles.retryButton} onPress={loadProducts}>
-            <Text style={styles.retryText}>Retry</Text>
-          </Pressable>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredProducts}
-          extraData={favoriteIds}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
+      <FlatList
+        data={filteredProducts}
+        extraData={favouriteIds}
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={<Text style={styles.empty} accessibilityRole="alert">No products match your search.</Text>}
+        renderItem={({ item }) => {
+          const isFavourite = favouriteIds.includes(item.id);
+
+          return (
             <Pressable
               style={styles.card}
               onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
@@ -1309,28 +1687,24 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
               <Image
                 source={{ uri: item.image }}
                 style={styles.image}
-                accessibilityLabel={item.name}
               />
               <Text style={styles.name}>{item.name}</Text>
               <Pressable
-                style={styles.favoriteButton}
+                style={styles.favouriteButton}
                 hitSlop={8}  /* NEW */
-                onPress={() => toggleFavorite(item.id).then(setFavoriteIds)}
+                onPress={() => toggleFavourite(item.id).then(setFavouriteIds)}
                 accessibilityRole="button"
-                accessibilityLabel={
-                  favoriteIds.includes(item.id)
-                    ? `Remove ${item.name} from favorites`
-                    : `Add ${item.name} to favorites`
-                }
+                accessibilityLabel={`Favourite ${item.name}`}
+                accessibilityState={{ selected: isFavourite }}
               >
-                <Text style={[styles.favoriteIcon, favoriteIds.includes(item.id) && styles.favoriteIconActive]}>
-                  {favoriteIds.includes(item.id) ? '♥' : '♡'}
+                <Text style={[styles.favouriteIcon, isFavourite && styles.favouriteIconActive]}>
+                  {isFavourite ? '♥' : '♡'}
                 </Text>
               </Pressable>
             </Pressable>
-          )}
-        />
-      )}
+          );
+        }}
+      />
     </View>
   );
 }
@@ -1338,13 +1712,22 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
+  },
+  searchLabel: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
   input: {
-    height: 44,
-    margin: 16,
+    minHeight: 44,
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.borderStrong,
     borderRadius: 22,
     paddingHorizontal: 16,
   },
@@ -1354,8 +1737,8 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: 'white',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -1368,29 +1751,33 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 12,
     borderBottomLeftRadius: 12,
   },
-  name: { flex: 1, padding: 12, fontSize: 16, fontWeight: '600' },
-  favoriteButton: {
+  // paddingRight keeps long names clear of the heart in the top-right corner.
+  name: { flex: 1, padding: 12, paddingRight: 44, fontSize: 16, fontWeight: '600' },
+  empty: { padding: 16, fontSize: 16, color: colors.textSecondary },
+  favouriteButton: {
     position: 'absolute',
     top: 6,
     right: 6,
-    width: 28,
-    height: 28,
+    minWidth: 28,
+    minHeight: 28,
     borderRadius: 14,
     backgroundColor: 'rgba(255,255,255,0.85)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  favoriteIcon: { fontSize: 16, color: '#6B6B6B' },
-  favoriteIconActive: { color: '#E60000' },
+  favouriteIcon: { fontSize: 16, color: colors.textSecondary },
+  favouriteIconActive: { color: colors.primary },
   loader: { flex: 1 },
   message: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
   retryButton: {
-    backgroundColor: '#E60000',
+    backgroundColor: colors.primary,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
   },
-  retryText: { color: 'white', fontWeight: '600' },
+  retryText: { color: colors.badgeText, fontWeight: '600' },
 });
 ```
 
@@ -1420,25 +1807,26 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { getFavoriteIds, getProducts, toggleFavorite } from '../services/productsService';  // UPDATED
+import { getFavouriteIds, getProducts, toggleFavourite } from '../services/productsService';  // UPDATED
 import type { ProductListScreenProps } from '../types/navigation';
+import { colors } from '../theme/colors';
 import { Product } from '../types/product';
 
-export default function ProductListScreen({ navigation }: ProductListScreenProps) {
+export default function ProductListScreen({ navigation }: Readonly<ProductListScreenProps>) {
   const [query, setQuery] = useState<string>('');
   const [products, setProducts] = useState<Product[]>([]);
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
-  const loadProducts = () => {
+  function loadProducts() {
     setLoading(true);
     setError(false);
     getProducts()
       .then(setProducts)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
-  };
+  }
 
   useEffect(() => {
     loadProducts();
@@ -1447,10 +1835,40 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
   // NEW
   useFocusEffect(
     useCallback(() => {
-      getFavoriteIds().then(setFavoriteIds);
+      getFavouriteIds()
+        .then(setFavouriteIds)
+        .catch(() => { /* This would normally be handled by a toast or some user notification. Out of scope. */ });
     }, [])
   );
   // END NEW
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator
+          size="large"
+          style={styles.loader}
+          accessibilityLabel="Loading products"
+        />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.message}>
+        <Text accessibilityRole="alert">Could not load products.</Text>
+        <Pressable
+          style={styles.retryButton}
+          onPress={loadProducts}
+          accessibilityRole="button"
+          accessibilityLabel="Retry loading products"
+        >
+          <Text style={styles.retryText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(query.trim().toLowerCase())
@@ -1458,29 +1876,31 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
 
   return (
     <View style={styles.container}>
+      <Text
+        style={styles.searchLabel}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+      >
+        Search phones
+      </Text>
       <TextInput
         value={query}
         onChangeText={setQuery}
         placeholder="Search phones & SIM cards"
+        placeholderTextColor={colors.textSecondary}
         keyboardType="default"
         accessibilityLabel="Search phones"
         style={styles.input}
       />
-      {loading ? (
-        <ActivityIndicator size="large" style={styles.loader} />
-      ) : error ? (
-        <View style={styles.message}>
-          <Text>Could not load products.</Text>
-          <Pressable style={styles.retryButton} onPress={loadProducts}>
-            <Text style={styles.retryText}>Retry</Text>
-          </Pressable>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredProducts}
-          extraData={favoriteIds}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
+      <FlatList
+        data={filteredProducts}
+        extraData={favouriteIds}
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={<Text style={styles.empty} accessibilityRole="alert">No products match your search.</Text>}
+        renderItem={({ item }) => {
+          const isFavourite = favouriteIds.includes(item.id);
+
+          return (
             <Pressable
               style={styles.card}
               onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
@@ -1488,28 +1908,24 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
               <Image
                 source={{ uri: item.image }}
                 style={styles.image}
-                accessibilityLabel={item.name}
               />
               <Text style={styles.name}>{item.name}</Text>
               <Pressable
-                style={styles.favoriteButton}
+                style={styles.favouriteButton}
                 hitSlop={8}
-                onPress={() => toggleFavorite(item.id).then(setFavoriteIds)}
+                onPress={() => toggleFavourite(item.id).then(setFavouriteIds)}
                 accessibilityRole="button"
-                accessibilityLabel={
-                  favoriteIds.includes(item.id)
-                    ? `Remove ${item.name} from favorites`
-                    : `Add ${item.name} to favorites`
-                }
+                accessibilityLabel={`Favourite ${item.name}`}
+                accessibilityState={{ selected: isFavourite }}
               >
-                <Text style={[styles.favoriteIcon, favoriteIds.includes(item.id) && styles.favoriteIconActive]}>
-                  {favoriteIds.includes(item.id) ? '♥' : '♡'}
+                <Text style={[styles.favouriteIcon, isFavourite && styles.favouriteIconActive]}>
+                  {isFavourite ? '♥' : '♡'}
                 </Text>
               </Pressable>
             </Pressable>
-          )}
-        />
-      )}
+          );
+        }}
+      />
     </View>
   );
 }
@@ -1517,13 +1933,22 @@ export default function ProductListScreen({ navigation }: ProductListScreenProps
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
+  },
+  searchLabel: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
   input: {
-    height: 44,
-    margin: 16,
+    minHeight: 44,
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: colors.borderStrong,
     borderRadius: 22,
     paddingHorizontal: 16,
   },
@@ -1533,8 +1958,8 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: 'white',
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
@@ -1547,37 +1972,283 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 12,
     borderBottomLeftRadius: 12,
   },
-  name: { flex: 1, padding: 12, fontSize: 16, fontWeight: '600' },
-  favoriteButton: {
+  // paddingRight keeps long names clear of the heart in the top-right corner.
+  name: { flex: 1, padding: 12, paddingRight: 44, fontSize: 16, fontWeight: '600' },
+  empty: { padding: 16, fontSize: 16, color: colors.textSecondary },
+  favouriteButton: {
     position: 'absolute',
     top: 6,
     right: 6,
-    width: 28,
-    height: 28,
+    minWidth: 28,
+    minHeight: 28,
     borderRadius: 14,
     backgroundColor: 'rgba(255,255,255,0.85)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  favoriteIcon: { fontSize: 16, color: '#6B6B6B' },
-  favoriteIconActive: { color: '#E60000' },
+  favouriteIcon: { fontSize: 16, color: colors.textSecondary },
+  favouriteIconActive: { color: colors.primary },
   loader: { flex: 1 },
   message: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
   retryButton: {
-    backgroundColor: '#E60000',
+    backgroundColor: colors.primary,
+    minHeight: 44,
+    justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 10,
     borderRadius: 8,
   },
-  retryText: { color: 'white', fontWeight: '600' },
+  retryText: { color: colors.badgeText, fontWeight: '600' },
 });
 ```
+
+---
+
+### Step 5: Add an action for screen readers
+
+The heart sits inside the card `Pressable`. A screen reader reads the card as one element, so the heart cannot be reached. `accessibilityActions` adds a custom action to the card, and `onAccessibilityAction` runs when the user chooses it.
+
+The card also gets a role and a label that describe what it does.
+
+**`src/screens/ProductListScreen.tsx`**
+
+```tsx
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { getFavouriteIds, getProducts, toggleFavourite } from '../services/productsService';
+import type { ProductListScreenProps } from '../types/navigation';
+import { colors } from '../theme/colors';
+import { Product } from '../types/product';
+
+export default function ProductListScreen({ navigation }: Readonly<ProductListScreenProps>) {
+  const [query, setQuery] = useState<string>('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
+
+  function loadProducts() {
+    setLoading(true);
+    setError(false);
+    getProducts()
+      .then(setProducts)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getFavouriteIds()
+        .then(setFavouriteIds)
+        .catch(() => { /* This would normally be handled by a toast or some user notification. Out of scope. */ });
+    }, [])
+  );
+
+  // NEW
+  async function onFavouriteButtonPress(product: Product) {
+    const updatedFavouriteIds = await toggleFavourite(product.id);
+    setFavouriteIds(updatedFavouriteIds);
+  }
+  // END NEW
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator
+          size="large"
+          style={styles.loader}
+          accessibilityLabel="Loading products"
+        />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.message}>
+        <Text accessibilityRole="alert">Could not load products.</Text>
+        <Pressable
+          style={styles.retryButton}
+          onPress={loadProducts}
+          accessibilityRole="button"
+          accessibilityLabel="Retry loading products"
+        >
+          <Text style={styles.retryText}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(query.trim().toLowerCase())
+  );
+
+  return (
+    <View style={styles.container}>
+      <Text
+        style={styles.searchLabel}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+      >
+        Search phones
+      </Text>
+      <TextInput
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Search phones & SIM cards"
+        placeholderTextColor={colors.textSecondary}
+        keyboardType="default"
+        accessibilityLabel="Search phones"
+        style={styles.input}
+      />
+      <FlatList
+        data={filteredProducts}
+        extraData={favouriteIds}
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={<Text style={styles.empty} accessibilityRole="alert">No products match your search.</Text>}
+        renderItem={({ item }) => {
+          const isFavourite = favouriteIds.includes(item.id);
+          // NEW
+          const favouriteLabel = isFavourite
+            ? `Remove ${item.name} from favourites`
+            : `Add ${item.name} to favourites`;
+          // END NEW
+
+          return (
+            <Pressable
+              style={styles.card}
+              onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
+              // NEW
+              accessibilityRole="button"
+              accessibilityLabel={`View details for ${item.name}`}
+              // A screen reader treats the card as one element, so the heart inside it can't be
+              // reached. Offer favouriting as a custom action instead.
+              accessibilityActions={[{ name: 'favourite', label: favouriteLabel }]}
+              onAccessibilityAction={async (event) => {
+                if (event.nativeEvent.actionName === 'favourite') {
+                  await onFavouriteButtonPress(item);
+                }
+              }}
+              // END NEW
+            >
+              <Image
+                source={{ uri: item.image }}
+                style={styles.image}
+              />
+              <Text style={styles.name}>{item.name}</Text>
+              <Pressable
+                style={styles.favouriteButton}
+                hitSlop={8}
+                onPress={() => onFavouriteButtonPress(item)}  /* UPDATED */
+                accessibilityRole="button"
+                accessibilityLabel={`Favourite ${item.name}`}
+                accessibilityState={{ selected: isFavourite }}
+              >
+                <Text style={[styles.favouriteIcon, isFavourite && styles.favouriteIconActive]}>
+                  {isFavourite ? '♥' : '♡'}
+                </Text>
+              </Pressable>
+            </Pressable>
+          );
+        }}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  searchLabel: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textPrimary,
+  },
+  input: {
+    minHeight: 44,
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    borderRadius: 22,
+    paddingHorizontal: 16,
+  },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.background,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  image: {
+    width: 110,
+    height: 110,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+  },
+  // paddingRight keeps long names clear of the heart in the top-right corner.
+  name: { flex: 1, padding: 12, paddingRight: 44, fontSize: 16, fontWeight: '600' },
+  empty: { padding: 16, fontSize: 16, color: colors.textSecondary },
+  favouriteButton: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    minWidth: 28,
+    minHeight: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  favouriteIcon: { fontSize: 16, color: colors.textSecondary },
+  favouriteIconActive: { color: colors.primary },
+  loader: { flex: 1 },
+  message: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
+  retryButton: {
+    backgroundColor: colors.primary,
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryText: { color: colors.badgeText, fontWeight: '600' },
+});
+```
+
+Optional, on a physical phone with VoiceOver or TalkBack on: move to a card, then find the "Add … to favourites" action. On iOS, swipe up or down on the card. On Android, open the TalkBack actions menu.
+
+---
 
 ### Check it
 
 1. Favourite a product.
-2. Close the app, then open it again:
-   - Phone: swipe Expo Go away from the app switcher, open it, then scan the QR code again.
-   - Simulator or emulator: close Expo Go (app switcher on iOS, Recents on Android), then press `i` (iOS) or `a` (Android) in the Metro terminal.
+2. Close the app, then open it again.
 3. It should still be a favourite.
 4. Optional: run `npm test`. Every test should pass.

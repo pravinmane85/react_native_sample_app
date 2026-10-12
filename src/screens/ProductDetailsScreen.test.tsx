@@ -1,11 +1,18 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 import ProductDetailsScreen from './ProductDetailsScreen';
 import type { ProductDetailsScreenProps } from '../types/navigation';
 import { products } from '../data/products';
 
+const mockSetOptions = jest.fn();
+
 const renderScreen = (id: string) =>
-  render(<ProductDetailsScreen {...({ navigation: {}, route: { params: { id } } } as unknown as ProductDetailsScreenProps)} />);
+  render(
+    <ProductDetailsScreen
+      {...({ navigation: { setOptions: mockSetOptions }, route: { params: { id } } } as unknown as ProductDetailsScreenProps)}
+    />
+  );
 
 const phone = products.find((product) => product.category === 'phone')!;
 const sim = products.find((product) => product.category === 'sim')!;
@@ -18,6 +25,11 @@ describe('<ProductDetailsScreen />', () => {
   test('shows a not found message for an unknown id', async () => {
     await renderScreen('does-not-exist');
     expect(screen.getByText('Product not found.')).toBeTruthy();
+  });
+
+  test('sets the header title to the product name', async () => {
+    await renderScreen(phone.id);
+    expect(mockSetOptions).toHaveBeenCalledWith({ title: phone.name });
   });
 
   test('shows phone details', async () => {
@@ -34,10 +46,16 @@ describe('<ProductDetailsScreen />', () => {
     expect(screen.getByText('About this plan')).toBeTruthy();
   });
 
-  test('toggles favorite', async () => {
+  test('toggles favourite', async () => {
     await renderScreen(phone.id);
-    await fireEvent.press(screen.getByLabelText(`Add ${phone.name} to favorites`));
-    await waitFor(() => expect(screen.getByLabelText(`Remove ${phone.name} from favorites`)).toBeTruthy());
-    expect(JSON.parse((await AsyncStorage.getItem('favoriteProductIds')) ?? '[]')).toEqual([phone.id]);
+    await fireEvent.press(screen.getByLabelText(`Favourite ${phone.name}`));
+    await waitFor(() => expect(screen.getByLabelText(`Favourite ${phone.name}`)).toBeSelected());
+  });
+
+  test('tells the user buying is not available when Buy is pressed', async () => {
+    const alert = jest.spyOn(Alert, 'alert');
+    await renderScreen(phone.id);
+    await fireEvent.press(screen.getByText(`Buy ${phone.name}`));
+    expect(alert).toHaveBeenCalledWith('Not available', 'Buying is not part of this demo.');
   });
 });
