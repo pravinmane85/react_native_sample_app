@@ -3,7 +3,6 @@
     "name": "react_native_sample_app",
     "slug": "react_native_sample_app",
     "version": "1.0.0",
-    "scheme": "reactnativesampleapp",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -21,9 +20,6 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "expo-router"
-    ]
+    }
   }
 }

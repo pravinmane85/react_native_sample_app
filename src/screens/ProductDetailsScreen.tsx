@@ -1,15 +1,19 @@
-import { useLocalSearchParams } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useFavorites } from '../../context/FavoritesContext';
-import { products } from '../../data/products';
-import { colors } from '../../theme/colors';
-import { typography } from '../../theme/typography';
+import { getFavoriteIds, toggleFavorite } from '../services/productsService';
+import type { ProductDetailsScreenProps } from '../types/navigation';
+import { products } from '../data/products';
+import { colors } from '../theme/colors';
+import { typography } from '../theme/typography';
 
-export default function ProductDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+export default function ProductDetailsScreen({ route }: ProductDetailsScreenProps) {
+  const { id } = route.params;
   const product = products.find((item) => item.id === id);
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    getFavoriteIds().then(setFavoriteIds);
+  }, []);
 
   if (!product) {
     return (
@@ -19,7 +23,7 @@ export default function ProductDetailScreen() {
     );
   }
 
-  const favorite = isFavorite(product.id);
+  const favorite = favoriteIds.includes(product.id);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -28,7 +32,7 @@ export default function ProductDetailScreen() {
         <Pressable
           style={styles.favoriteButton}
           hitSlop={8}
-          onPress={() => toggleFavorite(product.id)}
+          onPress={() => toggleFavorite(product.id).then(setFavoriteIds)}
           accessibilityRole="button"
           accessibilityLabel={favorite ? `Remove ${product.name} from favorites` : `Add ${product.name} to favorites`}
         >

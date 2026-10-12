@@ -1,0 +1,41 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { products } from '../data/products';
+import { Product } from '../types/product';
+
+const FAVORITES_KEY = 'favoriteProductIds';
+
+export function getProducts(): Promise<Product[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(products), 2000);
+  });
+}
+
+export function getFavoriteIds(): Promise<string[]> {
+  return loadFavoriteIds();
+}
+
+export async function toggleFavorite(productId: string): Promise<string[]> {
+  const current = await loadFavoriteIds();
+  const next = current.includes(productId)
+    ? current.filter((id) => id !== productId)
+    : [...current, productId];
+  await saveFavoriteIds(next);
+  return next;
+}
+
+async function loadFavoriteIds(): Promise<string[]> {
+  try {
+    const stored = await AsyncStorage.getItem(FAVORITES_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+async function saveFavoriteIds(ids: string[]): Promise<void> {
+  try {
+    await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
+  } catch {
+    // Saving favourites is best effort in this demo.
+  }
+}

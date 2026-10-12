@@ -1,0 +1,161 @@
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { getFavoriteIds, getProducts, toggleFavorite } from '../services/productsService';
+import type { ProductListScreenProps } from '../types/navigation';
+import { Product } from '../types/product';
+
+export default function ProductListScreen({ navigation }: ProductListScreenProps) {
+  const [query, setQuery] = useState<string>('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
+
+  const loadProducts = () => {
+    setLoading(true);
+    setError(false);
+    getProducts()
+      .then(setProducts)
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getFavoriteIds().then(setFavoriteIds);
+    }, [])
+  );
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(query.trim().toLowerCase())
+  );
+
+  return (
+    <View style={styles.container}>
+      <TextInput
+        value={query}
+        onChangeText={setQuery}
+        placeholder="Search phones & SIM cards"
+        keyboardType="default"
+        accessibilityLabel="Search phones"
+        style={styles.input}
+      />
+      {loading ? (
+        <ActivityIndicator size="large" style={styles.loader} />
+      ) : error ? (
+        <View style={styles.message}>
+          <Text>Could not load products.</Text>
+          <Pressable style={styles.retryButton} onPress={loadProducts}>
+            <Text style={styles.retryText}>Retry</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredProducts}
+          extraData={favoriteIds}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Pressable
+              style={styles.card}
+              onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
+            >
+              <Image
+                source={{ uri: item.image }}
+                style={styles.image}
+                accessibilityLabel={item.name}
+              />
+              <Text style={styles.name}>{item.name}</Text>
+              <Pressable
+                style={styles.favoriteButton}
+                hitSlop={8}
+                onPress={() => toggleFavorite(item.id).then(setFavoriteIds)}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  favoriteIds.includes(item.id)
+                    ? `Remove ${item.name} from favorites`
+                    : `Add ${item.name} to favorites`
+                }
+              >
+                <Text style={[styles.favoriteIcon, favoriteIds.includes(item.id) && styles.favoriteIconActive]}>
+                  {favoriteIds.includes(item.id) ? '♥' : '♡'}
+                </Text>
+              </Pressable>
+            </Pressable>
+          )}
+        />
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  input: {
+    height: 44,
+    margin: 16,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 22,
+    paddingHorizontal: 16,
+  },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  image: {
+    width: 110,
+    height: 110,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+  },
+  name: { flex: 1, padding: 12, fontSize: 16, fontWeight: '600' },
+  favoriteButton: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  favoriteIcon: { fontSize: 16, color: '#6B6B6B' },
+  favoriteIconActive: { color: '#E60000' },
+  loader: { flex: 1 },
+  message: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
+  retryButton: {
+    backgroundColor: '#E60000',
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryText: { color: 'white', fontWeight: '600' },
+});

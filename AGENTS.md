@@ -1,5 +1,14 @@
 This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
 
+## Purpose: interactive workshop
+
+This repo is the sample app for an interactive, hands-on workshop. Attendees clone it, run it on their own devices, simulators or emulators, and build on it during the session. They are not day-to-day Expo or React Native developers, so:
+
+- Keep the code simple, readable and conventional. Prefer plain React Native and widely used community libraries over Expo-specific ones.
+- Keep setup and run instructions in `README.md` short, step by step and accurate for each platform (iPhone, Android phone, iOS simulator, Android emulator, web). Don't add steps you haven't verified.
+- Avoid clever abstractions and large dependency additions. Anything attendees must install or configure should be justified and documented.
+- Expo is used as the tooling for the demo (Expo Go, `expo start`, EAS), not as something attendees need to learn.
+
 ## Expo has changed — do not trust your training data
 
 Expo ships breaking changes every SDK release. APIs you remember are likely renamed, moved, or removed. Before writing any code that touches an Expo, EAS, or React Native API:
@@ -25,9 +34,9 @@ Run lint and typecheck before declaring any task done.
 
 ## Navigation & Routing
 
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
-- Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
-- Docs: https://docs.expo.dev/router/introduction.md
+- Use **React Navigation** (`@react-navigation/native` + `native-stack`) for all navigation, not Expo Router. This is a workshop demo for people who won't use Expo day to day, so avoid Expo-specific libraries in app code where a plain React Native or community alternative exists. Expo stays only as the tooling (Expo Go, `expo start`, EAS) and `registerRootComponent` in `index.ts`.
+- The navigator lives in `src/App.tsx`. Route names and params are typed in `src/types/navigation.ts`. Screens are in `src/screens/` and receive `navigation` and `route` as props. Keep it flat: one file per screen, with its test next to it, and no per-component folders.
+- Docs: https://reactnavigation.org/docs/getting-started
 
 ## Building with EAS
 

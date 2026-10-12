@@ -39,3 +39,12 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Workshop attendee test copies
+.workshop-attendee/
+
+# macOS
+.DS_Store
+
+# Workshop test attendee agents (local only)
+.claude/agents/
