@@ -55,3 +55,4 @@ Start the app and leave it running while you work:
 Expo Go is installed into an emulator or simulator for you. On a real device, sign in to the same Expo account in Expo Go.
 
 You should see a header, "Phones & SIM cards", above an empty screen.
+# react-native-workshop
