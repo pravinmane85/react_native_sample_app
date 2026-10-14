@@ -5,5 +5,5 @@ export type RootStackParamList = {
   ProductDetails: { id: string };
 };
 
-export type ProductListScreenProps = NativeStackScreenProps<RootStackParamList, 'ProductList'>;
+export type ProductListScreenProps = Pick<NativeStackScreenProps<RootStackParamList, 'ProductList'>, 'navigation'>;
 export type ProductDetailsScreenProps = NativeStackScreenProps<RootStackParamList, 'ProductDetails'>;

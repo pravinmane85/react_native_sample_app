@@ -24,18 +24,10 @@ export async function toggleFavourite(productId: string): Promise<string[]> {
 }
 
 async function loadFavouriteIds(): Promise<string[]> {
-  try {
-    const stored = await AsyncStorage.getItem(FAVOURITES_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
+  const stored = await AsyncStorage.getItem(FAVOURITES_KEY);
+  return stored ? JSON.parse(stored) : [];
 }
 
 async function saveFavouriteIds(ids: string[]): Promise<void> {
-  try {
-    await AsyncStorage.setItem(FAVOURITES_KEY, JSON.stringify(ids));
-  } catch {
-    // Saving favourites is best effort in this demo.
-  }
+  await AsyncStorage.setItem(FAVOURITES_KEY, JSON.stringify(ids));
 }

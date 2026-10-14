@@ -7,7 +7,7 @@ export const phone: Product = {
   model: 'X',
   category: 'phone',
   price: '£500.00',
-  image: 'https://example.com/phone.png',
+  image: { uri: 'https://example.com/phone.png' },
   description: 'A phone for testing.',
   badge: 'New',
   colours: [
@@ -24,7 +24,7 @@ export const sim: Product = {
   category: 'sim',
   price: '£10.00',
   pricePeriod: 'per month',
-  image: 'https://example.com/sim.png',
+  image: { uri: 'https://example.com/sim.png' },
   description: 'A SIM plan for testing.',
   allowances: { data: 'Unlimited', minutes: '500', texts: 'Unlimited' },
 };

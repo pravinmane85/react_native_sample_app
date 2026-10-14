@@ -82,13 +82,6 @@ export default function ProductListScreen({ navigation }: Readonly<ProductListSc
 
   return (
     <View style={styles.container}>
-      <Text
-        style={styles.searchLabel}
-        accessibilityElementsHidden
-        importantForAccessibility="no"
-      >
-        Search phones
-      </Text>
       <TextInput
         value={query}
         onChangeText={setQuery}
@@ -105,30 +98,22 @@ export default function ProductListScreen({ navigation }: Readonly<ProductListSc
         ListEmptyComponent={<Text style={styles.empty} accessibilityRole="alert">No products match your search.</Text>}
         renderItem={({ item }) => {
           const isFavourite = favouriteIds.includes(item.id);
-          const favouriteLabel = isFavourite
-            ? `Remove ${item.name} from favourites`
-            : `Add ${item.name} to favourites`;
 
           return (
-            <Pressable
-              style={styles.card}
-              onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
-              accessibilityRole="button"
-              accessibilityLabel={`View details for ${item.name}`}
-              // A screen reader treats the card as one element, so the heart inside it can't be
-              // reached. Offer favouriting as a custom action instead.
-              accessibilityActions={[{ name: 'favourite', label: favouriteLabel }]}
-              onAccessibilityAction={async (event) => {
-                if (event.nativeEvent.actionName === 'favourite') {
-                  await onFavouriteButtonPress(item);
-                }
-              }}
-            >
-              <Image
-                source={{ uri: item.image }}
-                style={styles.image}
-              />
-              <Text style={styles.name}>{item.name}</Text>
+            <View style={styles.cardWrapper}>
+              <Pressable
+                style={styles.card}
+                onPress={() => navigation.navigate('ProductDetails', { id: item.id })}
+                accessibilityRole="button"
+                accessibilityLabel={`View details for ${item.name}`}
+              >
+                <Image
+                  source={item.image}
+                  style={styles.image}
+                />
+                <Text style={styles.name}>{item.name}</Text>
+              </Pressable>
+              {/* A sibling of the card, not nested inside it, so a screen reader can reach it on its own. */}
               <Pressable
                 style={styles.favouriteButton}
                 hitSlop={8}
@@ -141,7 +126,7 @@ export default function ProductListScreen({ navigation }: Readonly<ProductListSc
                   {isFavourite ? '♥' : '♡'}
                 </Text>
               </Pressable>
-            </Pressable>
+            </View>
           );
         }}
       />
@@ -154,27 +139,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-  searchLabel: {
-    marginHorizontal: 16,
-    marginTop: 16,
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
   input: {
     minHeight: 44,
-    marginHorizontal: 16,
-    marginTop: 8,
-    marginBottom: 16,
+    margin: 16,
     borderWidth: 1,
     borderColor: colors.borderStrong,
     borderRadius: 22,
     paddingHorizontal: 16,
   },
+  cardWrapper: {
+    margin: 16,
+  },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    margin: 16,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.borderStrong,
@@ -191,7 +169,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 12,
     borderBottomLeftRadius: 12,
   },
-  // paddingRight keeps long names clear of the heart in the top-right corner.
   name: { flex: 1, padding: 12, paddingRight: 44, fontSize: 16, fontWeight: '600' },
   empty: { padding: 16, fontSize: 16, color: colors.textSecondary },
   favouriteButton: {

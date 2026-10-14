@@ -23,8 +23,6 @@ export async function toggleFavourite(productId: string): Promise<string[]> {
   return next;
 }
 
-async function loadFavouriteIds(): Promise<string[]> {
-  return [];
-}
+async function loadFavouriteIds(): Promise<string[]> {}
 
 async function saveFavouriteIds(ids: string[]): Promise<void> {}

@@ -75,17 +75,4 @@ describe('<ProductListScreen />', () => {
       expect(JSON.parse((await AsyncStorage.getItem('favouriteProductIds')) ?? '[]')).toEqual([phone.id])
     );
   });
-
-  test('favourites a product with the screen reader action on the card', async () => {
-    await renderScreen();
-    const card = await screen.findByLabelText('View details for Test Phone X');
-    expect(card).toHaveProp('accessibilityActions', [{ name: 'favourite', label: 'Add Test Phone X to favourites' }]);
-
-    await fireEvent(card, 'accessibilityAction', { nativeEvent: { actionName: 'favourite' } });
-
-    await waitFor(async () =>
-      expect(JSON.parse((await AsyncStorage.getItem('favouriteProductIds')) ?? '[]')).toEqual([phone.id])
-    );
-    expect(screen.getByLabelText('Favourite Test Phone X')).toBeSelected();
-  });
 });

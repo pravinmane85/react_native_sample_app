@@ -19,7 +19,7 @@ export default function App() {
           contentStyle: { backgroundColor: colors.background },
         }}
       >
-        <Stack.Screen
+        <Stack.Screen 
           name="ProductList"
           component={ProductListScreen}
           options={{ title: 'Phones & SIM cards' }}

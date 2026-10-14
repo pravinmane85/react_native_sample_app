@@ -72,9 +72,9 @@ export default function ProductDetailsScreen({ navigation, route }: Readonly<Pro
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.imageWrapper}>
         <Image
-          source={{ uri: product.image }}
+          source={product.image}
           style={styles.image}
-          resizeMode="cover"
+          resizeMode="contain"
           accessible
           accessibilityLabel={`Photo of ${product.name}`}
         />
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    aspectRatio: 1,
+    height: 240,
     borderRadius: 12,
     backgroundColor: colors.surface,
   },

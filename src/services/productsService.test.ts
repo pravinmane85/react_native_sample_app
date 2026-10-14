@@ -30,8 +30,8 @@ describe('productsService', () => {
     expect(JSON.parse((await AsyncStorage.getItem('favouriteProductIds')) ?? '[]')).toEqual(['a']);
   });
 
-  test('ignores corrupt saved data', async () => {
+  test('rejects when saved data is corrupt, for the screen to handle', async () => {
     await AsyncStorage.setItem('favouriteProductIds', '{not json');
-    expect(await getFavouriteIds()).toEqual([]);
+    await expect(getFavouriteIds()).rejects.toThrow();
   });
 });

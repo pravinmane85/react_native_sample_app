@@ -1,3 +1,5 @@
+import { ImageSourcePropType } from 'react-native';
+
 export type Category = 'phone' | 'sim';
 
 export interface Colour {
@@ -19,7 +21,7 @@ export interface Product {
   category: Category;
   price: string;
   pricePeriod?: string;
-  image: string;
+  image: ImageSourcePropType;
   description: string;
   badge?: string;
   supports5G?: boolean;

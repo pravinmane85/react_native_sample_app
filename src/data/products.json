@@ -7,6 +7,7 @@
     "category": "phone",
     "price": "£1,099.00",
     "image": "https://picsum.photos/seed/iphone16pro/600/600",
+    "localImage": "assets/images/Apple_iPhone_16_Pro.png",
     "description": "The iPhone 16 Pro brings a titanium design, the A18 Pro chip and a pro camera system with 5x telephoto zoom. Available in a range of finishes.",
     "badge": "New",
     "supports5G": true,
@@ -33,6 +34,7 @@
     "category": "phone",
     "price": "£799.00",
     "image": "https://picsum.photos/seed/galaxys25/600/600",
+    "localImage": "assets/images/Samsung_Galaxy_S25_FE_icyblue.png",
     "description": "Galaxy S25 pairs a bright 6.2\" display with Galaxy AI features, a versatile triple camera and all-day battery life.",
     "badge": "3 offers available",
     "supports5G": true,
@@ -48,14 +50,15 @@
     ]
   },
   {
-    "id": "phone-pixel-9",
-    "name": "Google Pixel 9",
+    "id": "phone-pixel-11",
+    "name": "Google Pixel 11",
     "make": "Google",
-    "model": "Pixel 9",
+    "model": "Pixel 11",
     "category": "phone",
     "price": "£649.00",
-    "image": "https://picsum.photos/seed/pixel9/600/600",
-    "description": "Pixel 9 is built around Google AI, with a standout camera, the Tensor G4 chip and 7 years of OS updates.",
+    "image": "https://picsum.photos/seed/pixel11/600/600",
+    "localImage": "assets/images/Google_Pixel_11_frost.png",
+    "description": "Pixel 11 is built around Google AI, with a standout camera and long-term OS updates.",
     "supports5G": true,
     "colours": [
       {
@@ -80,6 +83,7 @@
     "category": "phone",
     "price": "£699.00",
     "image": "https://picsum.photos/seed/iphone15/600/600",
+    "localImage": "assets/images/Apple_iPhone_15_blue.png",
     "description": "iPhone 15 features a 48MP main camera, Dynamic Island and USB-C, powered by the A16 Bionic chip.",
     "badge": "2 offers available",
     "supports5G": true,
@@ -99,14 +103,15 @@
     ]
   },
   {
-    "id": "phone-motorola-edge-50",
-    "name": "Motorola Edge 50 Fusion",
+    "id": "phone-motorola-edge-70",
+    "name": "Motorola Edge 70 Fusion",
     "make": "Motorola",
-    "model": "Edge 50 Fusion",
+    "model": "Edge 70 Fusion",
     "category": "phone",
     "price": "£349.00",
-    "image": "https://picsum.photos/seed/motoedge50/600/600",
-    "description": "A curved pOLED display, 50MP camera and fast charging in a lightweight design with splash and dust resistance.",
+    "image": "https://picsum.photos/seed/motoedge70/600/600",
+    "localImage": "assets/images/Motorola_Edge_70_pantone.png",
+    "description": "A curved display, a great camera and fast charging in a lightweight design.",
     "supports5G": true,
     "colours": [
       {
@@ -127,6 +132,7 @@
     "category": "phone",
     "price": "£229.00",
     "image": "https://picsum.photos/seed/honormagic6lite/600/600",
+    "localImage": "assets/images/HONOR_Magic_V6.png",
     "description": "A large 6.78\" AMOLED display, 5,300mAh battery and a 108MP camera, built for everyday reliability.",
     "badge": "Best seller",
     "supports5G": true,
@@ -149,6 +155,7 @@
     "category": "phone",
     "price": "£149.00",
     "image": "https://picsum.photos/seed/doro8100/600/600",
+    "localImage": "assets/images/Doro_8100_grey.png",
     "description": "An easy-to-use smartphone with a simplified interface, loud speaker and an emergency assistance button.",
     "supports5G": false,
     "colours": [
@@ -167,6 +174,7 @@
     "price": "£1.00",
     "pricePeriod": "one-off",
     "image": "https://picsum.photos/seed/paygsim/600/600",
+    "localImage": "assets/images/Vodafone-SIM.png",
     "description": "Top up whenever you like with no monthly commitment. Great for occasional use or as a spare SIM.",
     "allowances": {
       "data": "Pay as you go",
@@ -183,6 +191,7 @@
     "price": "£10.00",
     "pricePeriod": "/month",
     "image": "https://picsum.photos/seed/simonly10gb/600/600",
+    "localImage": "assets/images/Vodafone-SIM.png",
     "description": "12 month SIM only plan with 10GB of 5G data, unlimited minutes and unlimited texts.",
     "badge": "1 offer available",
     "supports5G": true,
@@ -201,6 +210,7 @@
     "price": "£16.00",
     "pricePeriod": "/month",
     "image": "https://picsum.photos/seed/simonly50gb/600/600",
+    "localImage": "assets/images/Vodafone-SIM.png",
     "description": "12 month SIM only plan with 50GB of 5G data, unlimited minutes and unlimited texts, plus EU roaming.",
     "badge": "Most popular",
     "supports5G": true,
@@ -219,6 +229,7 @@
     "price": "£24.00",
     "pricePeriod": "/month",
     "image": "https://picsum.photos/seed/simonlyunlimited/600/600",
+    "localImage": "assets/images/Vodafone-SIM.png",
     "description": "12 month SIM only plan with unlimited 5G data, unlimited minutes and unlimited texts, plus EU roaming.",
     "supports5G": true,
     "allowances": {
@@ -236,6 +247,7 @@
     "price": "£13.00",
     "pricePeriod": "/month",
     "image": "https://picsum.photos/seed/familysim30gb/600/600",
+    "localImage": "assets/images/Vodafone-SIM.png",
     "description": "Share data across the family with 30GB, unlimited minutes and unlimited texts on a flexible 1 month plan.",
     "allowances": {
       "data": "30GB",
